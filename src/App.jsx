@@ -1,32 +1,74 @@
-import { useState } from "react";
-import reactLogo from "./assets/react.svg";
-import viteLogo from "/vite.svg";
+import { useEffect, useState } from "react";
+
 import "./App.css";
+import { todoClient } from "./lib/todoClient";
 function App() {
-  const [count, setCount] = useState(0);
+  const [todos, setTodos] = useState([]);
+  const [text, setText] = useState("");
+
+  const getTodos = async () => {
+    const { data } = await todoClient.get("/");
+
+    setTodos(data);
+  };
+  useEffect(() => {
+    getTodos();
+  }, []);
+  const addTodos = async () => {
+    //서버에 데이타 추가
+    const { data } = await todoClient.post("/", {
+      text,
+      completed: false,
+    });
+
+    await getTodos();
+
+    return data;
+  };
+  const toggleTodoComplete = async (id, currentCompleted) => {
+    const { data } = await todoClient.patch(`/${id}`, {
+      completed: !currentCompleted,
+    });
+    await getTodos();
+    return data;
+  };
+
+  const deleteTodo = async (id) => {
+    const { data } = await todoClient.delete(`/${id}`);
+    await getTodos();
+    return data;
+  };
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <h1>베이직반12회차 </h1>
+      <form onSubmit={addTodos}>
+        <input
+          type="text"
+          value={text}
+          onChange={(e) => {
+            e.preventDefault();
+            setText(e.target.value);
+          }}
+        />
+        <button>추가하기</button>
+      </form>
+      {todos.map(function (todo) {
+        return (
+          <div key={todo.id}>
+            <span onClick={() => toggleTodoComplete(todo.id, todo.completed)}>
+              {todo.text}
+            </span>
+            <button
+              onClick={() => {
+                deleteTodo(todo.id);
+              }}
+            >
+              삭제
+            </button>
+          </div>
+        );
+      })}
     </>
   );
 }
