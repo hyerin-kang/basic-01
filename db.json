@@ -1,0 +1,19 @@
+{
+  "todos": [
+    {
+      "id": "1",
+      "text": "우유사기",
+      "completed": true
+    },
+    {
+      "id": "2",
+      "text": "샤워하기",
+      "completed": false
+    },
+    {
+      "id": "c8fe",
+      "text": "제이슨서버",
+      "completed": false
+    }
+  ]
+}
